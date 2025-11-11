@@ -3,12 +3,19 @@ package com.devops.projeto_ac2.domain.valueobjects;
 import com.devops.projeto_ac2.domain.exceptions.InvalidValueObjectException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 /**
  * Value Object representando a média final do aluno
  * Encapsula regras de validação de nota
+ * 
+ * Lombok Annotations:
+ * - @Getter: Acesso ao valor
+ * - @ToString: Representação em string
+ * - @EqualsAndHashCode: Comparação por valor
  */
 @Getter
+@ToString
 @EqualsAndHashCode
 public class MediaFinal {
     

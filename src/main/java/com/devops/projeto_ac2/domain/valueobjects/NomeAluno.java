@@ -3,12 +3,19 @@ package com.devops.projeto_ac2.domain.valueobjects;
 import com.devops.projeto_ac2.domain.exceptions.InvalidValueObjectException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 /**
  * Value Object representando o nome do aluno
  * Encapsula regras de validação de nome
+ * 
+ * Lombok Annotations:
+ * - @Getter: Acesso ao valor
+ * - @ToString: Representação em string
+ * - @EqualsAndHashCode: Comparação por valor
  */
 @Getter
+@ToString
 @EqualsAndHashCode
 public class NomeAluno {
     

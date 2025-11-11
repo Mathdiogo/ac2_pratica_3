@@ -4,15 +4,22 @@ import com.devops.projeto_ac2.domain.exceptions.InvalidValueObjectException;
 import jakarta.persistence.Embeddable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.util.Objects;
 
 /**
  * Value Object representando o RA (Registro Acadêmico) do Aluno
  * Seguindo DDD: Value Objects são imutáveis e possuem validações
+ * 
+ * Lombok Annotations:
+ * - @Getter: Acesso ao valor
+ * - @ToString: Representação em string
+ * - @EqualsAndHashCode: Comparação por valor
  */
 @Embeddable
 @Getter
+@ToString
 @EqualsAndHashCode
 public class RegistroAcademico {
     

@@ -5,25 +5,33 @@ import com.devops.projeto_ac2.domain.valueobjects.MediaFinal;
 import com.devops.projeto_ac2.domain.valueobjects.NomeAluno;
 import com.devops.projeto_ac2.domain.valueobjects.RegistroAcademico;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 /**
  * Entidade Aluno seguindo DDD
  * Entidade rica com comportamentos de negócio, não apenas getters/setters
+ * 
+ * Lombok Annotations:
+ * - @Getter: Gera getters automaticamente (leitura dos atributos)
+ * - @ToString: Gera método toString() para debug e logs
+ * - @EqualsAndHashCode(onlyExplicitlyIncluded = true): Gera equals/hashCode baseado no ID
+ * - @NoArgsConstructor: Construtor vazio para JPA/Hibernate
  */
 @Entity
 @Table(name = "tb_alunos")
 @Getter
+@ToString(of = {"id", "nome", "registroAcademico", "mediaFinal", "concluiu"})
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor(access = AccessLevel.PROTECTED) // Para JPA
 public class Aluno {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @EqualsAndHashCode.Include // Incluir ID no equals/hashCode
     private Long id;
+    
     
     @Column(nullable = false, length = 100)
     private String nome;

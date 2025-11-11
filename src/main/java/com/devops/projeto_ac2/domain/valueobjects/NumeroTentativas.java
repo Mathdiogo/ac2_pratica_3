@@ -3,11 +3,18 @@ package com.devops.projeto_ac2.domain.valueobjects;
 import com.devops.projeto_ac2.domain.exceptions.InvalidValueObjectException;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 /**
  * Value Object representando o número de tentativas de avaliação
+ * 
+ * Lombok Annotations:
+ * - @Getter: Acesso ao valor
+ * - @ToString: Representação em string
+ * - @EqualsAndHashCode: Comparação por valor
  */
 @Getter
+@ToString
 @EqualsAndHashCode
 public class NumeroTentativas {
     

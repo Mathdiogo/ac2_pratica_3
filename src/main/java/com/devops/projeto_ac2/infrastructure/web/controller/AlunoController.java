@@ -13,6 +13,13 @@ import com.devops.projeto_ac2.shared.dto.CriarAlunoRequestDTO;
 import com.devops.projeto_ac2.shared.dto.RegistrarTentativaRequestDTO;
 import com.devops.projeto_ac2.shared.dto.RankingResponseDTO;
 import com.devops.projeto_ac2.shared.mapper.AlunoMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +35,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/alunos")
 @CrossOrigin(origins = "*")
+@Tag(name = "Alunos", description = "API de gerenciamento de alunos")
 public class AlunoController {
     
     private final CriarAlunoUseCase criarAlunoUseCase;
@@ -58,6 +66,13 @@ public class AlunoController {
     /**
      * POST /api/alunos - Criar novo aluno
      */
+    @Operation(summary = "Criar novo aluno", description = "Cria um novo aluno com nome e RA únicos")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Aluno criado com sucesso",
+                    content = @Content(schema = @Schema(implementation = AlunoResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Dados inválidos ou RA já existente"),
+            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
+    })
     @PostMapping
     public ResponseEntity<AlunoResponseDTO> criar(@Valid @RequestBody CriarAlunoRequestDTO request) {
         Aluno aluno = criarAlunoUseCase.executar(request.getNome(), request.getRa());
@@ -68,8 +83,15 @@ public class AlunoController {
     /**
      * GET /api/alunos/{id} - Buscar aluno por ID
      */
+    @Operation(summary = "Buscar aluno por ID", description = "Retorna os dados completos de um aluno")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Aluno encontrado",
+                    content = @Content(schema = @Schema(implementation = AlunoResponseDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Aluno não encontrado")
+    })
     @GetMapping("/{id}")
-    public ResponseEntity<AlunoResponseDTO> buscarPorId(@PathVariable Long id) {
+    public ResponseEntity<AlunoResponseDTO> buscarPorId(
+            @Parameter(description = "ID do aluno") @PathVariable Long id) {
         Aluno aluno = buscarAlunoPorIdUseCase.executar(id);
         AlunoResponseDTO response = alunoMapper.toResponseDTO(aluno);
         return ResponseEntity.ok(response);
@@ -78,8 +100,13 @@ public class AlunoController {
     /**
      * GET /api/alunos - Listar todos os alunos
      */
+    @Operation(summary = "Listar alunos", description = "Lista todos os alunos com filtro opcional de conclusão")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso")
+    })
     @GetMapping
     public ResponseEntity<List<AlunoResponseDTO>> listarTodos(
+            @Parameter(description = "Filtrar por conclusão: true (concluídos), false (não concluídos), null (todos)")
             @RequestParam(required = false) Boolean concluido) {
         
         List<Aluno> alunos;
@@ -104,9 +131,15 @@ public class AlunoController {
     /**
      * POST /api/alunos/{id}/tentativas - Registrar tentativa de avaliação
      */
+    @Operation(summary = "Registrar tentativa", description = "Registra uma tentativa de avaliação (máximo 3 tentativas)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Tentativa registrada com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Aluno não encontrado"),
+            @ApiResponse(responseCode = "409", description = "Limite de tentativas esgotado")
+    })
     @PostMapping("/{id}/tentativas")
     public ResponseEntity<AlunoResponseDTO> registrarTentativa(
-            @PathVariable Long id,
+            @Parameter(description = "ID do aluno") @PathVariable Long id,
             @Valid @RequestBody RegistrarTentativaRequestDTO request) {
         
         Aluno aluno = registrarTentativaUseCase.executar(id, request.getNota());
@@ -117,9 +150,15 @@ public class AlunoController {
     /**
      * PATCH /api/alunos/{id}/concluir - Concluir curso do aluno
      */
+    @Operation(summary = "Concluir curso", description = "Finaliza o curso do aluno aplicando bônus conforme média")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Curso concluído com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Aluno já concluiu ou sem tentativas"),
+            @ApiResponse(responseCode = "404", description = "Aluno não encontrado")
+    })
     @PatchMapping("/{id}/concluir")
     public ResponseEntity<AlunoResponseDTO> concluirCurso(
-            @PathVariable Long id,
+            @Parameter(description = "ID do aluno") @PathVariable Long id,
             @Valid @RequestBody ConcluirCursoRequestDTO request) {
         
         Aluno aluno = concluirCursoUseCase.executar(id, request.getMediaFinal());
@@ -130,10 +169,14 @@ public class AlunoController {
     /**
      * GET /api/alunos/ranking - Obter ranking completo dos alunos
      */
+    @Operation(summary = "Obter ranking", description = "Retorna ranking dos alunos ordenado por média e cursos extras")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ranking retornado com sucesso")
+    })
     @GetMapping("/ranking")
     public ResponseEntity<List<RankingResponseDTO>> obterRanking(
-            @RequestParam(required = false) Integer top,
-            @RequestParam(required = false) Boolean apenasAprovados) {
+            @Parameter(description = "Limitar top N alunos") @RequestParam(required = false) Integer top,
+            @Parameter(description = "Filtrar apenas aprovados") @RequestParam(required = false) Boolean apenasAprovados) {
         
         List<Aluno> alunos;
         
